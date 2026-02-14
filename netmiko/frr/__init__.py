@@ -1,3 +1,3 @@
-from netmiko.frr.frr_ssh import FrrSSH
+from netmiko.frr.frr_ssh import FrrSSH, FrrDockerExecSession
 
-__all__ = ["FrrSSH"]
+__all__ = ["FrrSSH", "FrrDockerExecSession"]

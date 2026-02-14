@@ -699,11 +699,12 @@ where x is the total number of seconds to wait before timing out.\n"""
         loop_delay = 0.01
         start_time = time.time()
         # if read_timeout == 0 or 0.0 keep reading indefinitely
+        log.debug(f'waiting for {pattern=} to appear')
         while (time.time() - start_time < read_timeout) or (not read_timeout):
             output += self.read_channel()
 
             if re.search(pattern, output, flags=re_flags):
-                if "(" in pattern and "(?:" not in pattern:
+                if re.search(r"[^\\]\(", pattern) and "(?:" not in pattern:
                     msg = f"""
 Parenthesis found in pattern.
 
@@ -800,6 +801,7 @@ You can also look at the Netmiko session_log or debug log for more information.\
 
         # Set read_timeout to 0 to never timeout
         while (time.time() - start_time < read_timeout) or (not read_timeout):
+            log.debug(f"Sleeping for {loop_delay}")
             time.sleep(loop_delay)
             new_data = self.read_channel()
             # gather new output
@@ -808,6 +810,7 @@ You can also look at the Netmiko session_log or debug log for more information.\
             # if we have some output, but nothing new, then do the last read
             elif channel_data != "":
                 # Make sure really done (i.e. no new data)
+                log.debug(f"Sleeping for {last_read}")
                 time.sleep(last_read)
                 new_data = self.read_channel()
                 if not new_data:
@@ -2159,6 +2162,7 @@ You can also look at the Netmiko session_log or debug log for more information.
                     pattern=re.escape(config_command.strip())
                 )
             if pattern:
+                log.debug(f'In config_mode:: {pattern=}')
                 output += self.read_until_pattern(pattern=pattern, re_flags=re_flags)
             else:
                 output += self.read_until_prompt(read_entire_line=True)
