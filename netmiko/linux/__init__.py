@@ -1,3 +1,3 @@
-from netmiko.linux.linux_ssh import LinuxSSH, LinuxFileTransfer
+from netmiko.linux.linux_ssh import LinuxSSH, LinuxFileTransfer, LinuxDockerExecSession
 
-__all__ = ["LinuxSSH", "LinuxFileTransfer"]
+__all__ = ["LinuxSSH", "LinuxFileTransfer", "LinuxDockerExecSession"]

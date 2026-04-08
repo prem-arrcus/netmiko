@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 from netmiko.cisco_base_connection import CiscoSSHConnection
 from netmiko.cisco_base_connection import CiscoFileTransfer
+from netmiko.docker import DockerExecBaseSession
 from netmiko.exceptions import ReadTimeout
 
 LINUX_PROMPT_PRI = os.getenv("NETMIKO_LINUX_PROMPT_PRI", "$")
@@ -22,6 +23,19 @@ class LinuxSSH(CiscoSSHConnection):
         self.ansi_escape_codes = True
         self._test_channel_read(pattern=self.prompt_pattern)
         self.set_base_prompt()
+
+        self.setup_terminal()
+        super().session_preparation()
+
+    def setup_terminal(self) -> None:
+        # disable window title changes
+        self.write_channel(" unset PROMPT_COMMAND PS0\n")
+        # disable bracketed paste
+        self.write_channel(" bind 'set enable-bracketed-paste off'\n")
+        # Disable colors
+        self.write_channel(" export TERM=dumb\n")
+        # use simple prompt
+        self.write_channel(r" export PS1='\u@\h:\w\$ '" + "\n")
 
     def _enter_shell(self) -> str:
         """Already in shell."""
@@ -242,3 +256,30 @@ class LinuxFileTransfer(CiscoFileTransfer):
 
     def disable_scp(self, cmd: str = "") -> None:
         raise NotImplementedError
+
+
+class LinuxDockerExecSession(LinuxSSH, DockerExecBaseSession):
+    """Implement methods for interacting with FRR devices over DockerExec Session."""
+
+    def __init__(self, host: str, collect_boot_logs: bool = False, **kwargs: dict) -> None:
+        """Init method for this Docker Exec session."""
+        DockerExecBaseSession.__init__(self, host, collect_boot_logs, **kwargs)
+
+    def session_preparation(self) -> None:
+        """Prepare the session after the connection has been established."""
+        # Invoke Docker's session_preparation first
+        self.wait_for_bootup = True
+        DockerExecBaseSession.session_preparation(self)
+        super().session_preparation()
+
+        # running commands that exceed 80 chars (including the prompt size) fails
+        # due to the command getting wrapped to the next line, when "stty rows 0" is set
+        # Let us use "stty rows 50" to prevent that
+        self.set_terminal_width(command=" stty cols 511; stty rows 50; stty size")
+        self._send_command_str("setterm -linewrap off")
+
+    def cleanup(self, command: str = "exit") -> None: 
+        """Gracefully exit the Docker Exec session."""
+        self.write_channel(command + self.RETURN)
+        self.close()
+        super().cleanup()

@@ -14,6 +14,7 @@ from netmiko.alcatel import AlcatelAosSSH
 from netmiko.allied_telesis import AlliedTelesisAwplusSSH
 from netmiko.arista import AristaSSH, AristaTelnet
 from netmiko.arista import AristaFileTransfer
+from netmiko.arrcus import ArcosSSH, ArcosDockerExecSession
 from netmiko.arris import ArrisCERSSH
 from netmiko.apc import ApcAosSSH
 from netmiko.apresia import ApresiaAeosSSH, ApresiaAeosTelnet
@@ -104,6 +105,8 @@ from netmiko.fiberstore import (
 )
 from netmiko.flexvnf import FlexvnfSSH
 from netmiko.fortinet import FortinetSSH
+from netmiko.docker import DockerExecSession
+from netmiko.frr import FrrSSH, FrrDockerExecSession
 from netmiko.garderos import GarderosGrsSSH
 from netmiko.genexis import GenexisSOLT33Telnet
 from netmiko.hillstone import HillstoneStoneosSSH
@@ -116,7 +119,7 @@ from netmiko.juniper import JuniperSSH, JuniperTelnet, JuniperScreenOsSSH
 from netmiko.juniper import JuniperFileTransfer
 from netmiko.keymile import KeymileSSH, KeymileNOSSSH
 from netmiko.lancom import LancomLCOSSX4SSH
-from netmiko.linux import LinuxSSH, LinuxFileTransfer
+from netmiko.linux import LinuxSSH, LinuxFileTransfer, LinuxDockerExecSession
 from netmiko.maipu import MaipuSSH
 from netmiko.maipu import MaipuTelnet
 from netmiko.mikrotik import MikrotikRouterOsSSH, MikrotikRouterOsFileTransfer
@@ -195,6 +198,8 @@ CLASS_MAPPER_BASE = {
     "allied_telesis_awplus": AlliedTelesisAwplusSSH,
     "apc_aos": ApcAosSSH,
     "apresia_aeos": ApresiaAeosSSH,
+    "arcos": ArcosSSH,
+    "arcos_docker": ArcosDockerExecSession,
     "arista_eos": AristaSSH,
     "arris_cer": ArrisCERSSH,
     "aruba_os": ArubaOsSSH,
@@ -277,6 +282,9 @@ CLASS_MAPPER_BASE = {
     "fiberstore_networkos": FiberstoreNetworkOSSSH,
     "flexvnf": FlexvnfSSH,
     "fortinet": FortinetSSH,
+    "frr": FrrSSH,
+    "frr_docker": FrrDockerExecSession,
+    "docker": DockerExecSession,
     "garderos_grs": GarderosGrsSSH,
     "generic": GenericSSH,
     "generic_termserver": TerminalServerSSH,
@@ -299,6 +307,7 @@ CLASS_MAPPER_BASE = {
     "keymile_nos": KeymileNOSSSH,
     "lancom_lcossx4": LancomLCOSSX4SSH,
     "linux": LinuxSSH,
+    "linux_docker": LinuxDockerExecSession,
     "mikrotik_routeros": MikrotikRouterOsSSH,
     "mikrotik_switchos": MikrotikSwitchOsSSH,
     "mellanox": MellanoxMlnxosSSH,
