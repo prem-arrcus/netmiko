@@ -407,6 +407,7 @@ class ArcosConnection(NoEnable, CiscoSSHConnection):
             self.session_log.fin = True
         self.write_channel(command + self.RETURN)
 
+
 class ArcosSSH(ArcosConnection):
     """Implement methods for interacting with FRR  devices over SSH."""
 
