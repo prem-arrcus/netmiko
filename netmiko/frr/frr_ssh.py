@@ -4,8 +4,6 @@ This driver connects to a Linux host via SSH, then enters the FRR vtysh shell.
 It supports configuration mode via 'configure terminal'.
 """
 
-from typing import Any, Optional
-import re
 import time
 
 from netmiko import log
@@ -15,9 +13,8 @@ from netmiko.exceptions import ReadTimeout
 from netmiko.no_enable import NoEnable
 
 
-class FrrSSH(NoEnable, CiscoSSHConnection):
-    """
-    Implement methods for interacting with FRR (Free Range Routing) devices.
+class FrrConnection(NoEnable, CiscoSSHConnection):
+    """Implement methods for interacting with FRR (Free Range Routing) devices.
 
     FRR runs on Linux and uses vtysh as its CLI interface. This driver:
     1. Connects to the Linux host via SSH
