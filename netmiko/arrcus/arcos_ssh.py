@@ -5,10 +5,10 @@ It supports configuration mode via 'configure terminal'.
 """
 
 import time
-
 from typing import Iterator, Sequence, TextIO
 
 from netmiko import log
+from netmiko.base_connection import flush_session_log
 from netmiko.cisco_base_connection import CiscoSSHConnection
 from netmiko.docker import DockerExecBaseSession
 from netmiko.exceptions import ReadTimeout
@@ -67,6 +67,7 @@ class ArcosConnection(NoEnable, CiscoSSHConnection):
         self.clear_buffer()
         log.info("Done clearing buffer")
 
+    @flush_session_log
     def enter_confd_cli(self, confd_command: str = "cli") -> str:
         """Enter the ConfD CLI shell from Linux shell.
 
@@ -96,6 +97,7 @@ class ArcosConnection(NoEnable, CiscoSSHConnection):
                 "Failed to see the expected prompt on trying to enter ConfD CLI shell"
             ) from err
 
+    @flush_session_log
     def exit_confd_cli(self) -> str:
         """Exit ConfD CLI shell and return to Linux shell.
 
@@ -191,6 +193,7 @@ class ArcosConnection(NoEnable, CiscoSSHConnection):
             config_command=config_command, pattern=pattern or r'\(config\)# ', re_flags=re_flags
         )
 
+    @flush_session_log
     def exit_config_mode(self, exit_config: str = "end", pattern: str = r"#.*") -> str:
         """Exit from configuration mode.
 
@@ -292,17 +295,21 @@ class ArcosConnection(NoEnable, CiscoSSHConnection):
 
         output += super().send_config_set(
             config_commands,
+            exit_config_mode=False,
             enter_config_mode=enter_config_mode,
-            exit_config_mode=exit_config_mode,
             **kwargs
         )
 
         # Config has been sent
-        if "commit" not in config_commands:
+        if "commit" not in config_commands and not commit_config:
             self.config_changed = True
 
+        commit_config = commit_config or exit_config_mode
         if commit_config:
             output += self.commit()
+
+        if exit_config_mode:
+            self.exit_config_mode()
 
         return output
 
