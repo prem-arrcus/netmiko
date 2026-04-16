@@ -61,6 +61,7 @@ class FrrConnection(NoEnable, CiscoSSHConnection):
 
         Returns:
             Output from entering vtysh.
+
         """
         self.last_seen_prompt = ""
         if '@' not in self.find_prompt():
